@@ -1,0 +1,565 @@
+<html>
+    <head>
+        <title>Take Home Pay Calculator</title>
+        <link rel="icon" type="image/x-icon" href="fav.svg">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    </head>
+
+    <body class="bg-light">
+
+    <div class="container">
+        <div class="py-5 text-center">
+            <h2>Take Home Pay Calculator</h2>
+            <p class="lead">This is a way to estimate your take home pay after you account for things like retirement savings, stipends, etc. All calculations are done on your local computer and nothing is sent or stored anywhere else. It is very much an estimate and it is extremely not tax advice.</p>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 order-md-1">
+                <h4 class="mb-3">Income</h4>
+                <div class="row">
+                    <label for="salary">Salary (Annual)</label>
+                    <div class="input-group col-md-12 mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="salary" placeholder="" value="0.00">
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="stipends">Stipends (Annual)</label>
+                    <div class="input-group col-md-12 mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="stipends" placeholder="" value="0.00">
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="stipends">GTL (Life Insurance Reimbursement) (Pay Period)</label>
+                    <div class="input-group col-md-12 mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="gtl" placeholder="" value="0.00">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 order-md-1">
+                <h4 class="mb-3">Deductions</h4>
+                <div class="row">
+                    <label for="retirement-cash">403B (Annual)</label>
+                    <div class="btn-group mb-3" id="retirement-type" role="group" aria-label="Basic radio toggle button group">
+                        <input type="radio" class="btn-check" name="retirement" id="trad" autocomplete="off" checked>
+                        <label class="btn btn-outline-primary" for="trad">Traditional</label>
+
+                        <input type="radio" class="btn-check" name="retirement" id="roth" autocomplete="off">
+                        <label class="btn btn-outline-primary" for="roth">Roth</label>
+                    </div>
+                    <div class="input-group col-md-12 mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="retirement-cash" placeholder="" onchange="edit_retirement(this)" value="0.00">
+                    </div>
+                    <div class="input-group col-md-12 mb-3">
+                        <input type="number" class="form-control" id="retirement-percent" placeholder="" onchange="edit_retirement(this)" value="0.00">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="transit">Transit (Pay Period)</label>
+                        <input type="number" class="form-control" id="transit" placeholder="" value="0.00">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12 mb-3">
+                        <label for="insurance">Insurance (Pay Period)</label>
+                        <input type="number" class="form-control" id="insurance" placeholder="" value="0.00">
+                    </div>
+                </div>
+                <div class="row">
+                    <label for="hsa-cash">HSA (Annual)</label>
+                    <div class="input-group col-md-12 mb-3">
+                        <span class="input-group-text">$</span>
+                        <input type="number" class="form-control" id="hsa-cash" placeholder="" onchange="edit_hsa(this)" value="0.00">
+                    </div>
+                    <div class="input-group col-md-12 mb-3">
+                        <input type="number" class="form-control" id="hsa-percent" placeholder="" onchange="edit_hsa(this)" value="0.00" max="100" min="0.00">
+                        <span class="input-group-text">%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 order-md-2 mb-4">
+                <h4 class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="text">Monthly Take Home</span>
+                    <span class="badge badge-secondary badge-pill">3</span>
+                </h4>
+                <div class="input-group mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="" id="include-stipends" checked>
+                        <label class="form-check-label" for="include-stipends">
+                            Include Stipends
+                        </label>
+                    </div>
+                </div>
+                <div class="input-group mb-3">
+                    <label class="input-group-text" for="filing-as">Filing as...</label>
+                    <select class="form-select" id="filing-as">
+                        <option value="single" selected>Single</option>
+                        <option value="joint">Married</option>
+                        <option value="head">Head of Household</option>
+                    </select>
+                </div>
+                <ul class="list-group mb-3">
+                    <li class="list-group-item d-flex justify-content-between">
+                        <div>
+                            <span>Income</span>
+                            <small></small>
+                        </div>
+                        <span class="text-success" id="income">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>Deductions</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="deductions">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>Social Security</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="social-security">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>Medicare</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="medicare">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>Federal Taxes</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="federal-taxes">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>NY State</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="state-taxes">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between lh-condensed">
+                        <div>
+                            <span>NYC</span>
+                            <small class="text-muted"></small>
+                        </div>
+                        <span class="text-danger" id="local-taxes">$0.00</span>
+                    </li>
+                    <li class="list-group-item d-flex justify-content-between">
+                        <h6 class="my-0">Total</h6>
+                        <strong id="total">$0.00</strong>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <footer class="my-5 pt-5 text-muted text-center text-small">
+            <p class="mb-1" id="copyright">&copy; <span id="copy-year"></span> Louis Minsky</p>
+        </footer>
+    </div>
+
+    <script>
+        let retirement_last_edited = "retirement-cash";
+        let hsa_last_edited = "hsa-cash";
+        // let hsa_last_edited = "cash";
+
+        let brackets = {
+            federal: {
+                single: [
+                    {
+                        cap: 12400,
+                        rate: .10
+                    },
+                    {
+                        cap: 50400,
+                        rate: .12
+                    },
+                    {
+                        cap: 105700,
+                        rate: .22
+                    },
+                    {
+                        cap: 201775,
+                        rate: .24
+                    },
+                    {
+                        cap: 256225,
+                        rate: .32
+                    },
+                    {
+                        cap: 640600,
+                        rate: .35
+                    },
+                    {
+                        rate: .37
+                    },
+                ],
+                joint: [
+                    {
+                        cap: 24800,
+                        rate: .10
+                    },
+                    {
+                        cap: 100800,
+                        rate: .12
+                    },
+                    {
+                        cap: 211400,
+                        rate: .22
+                    },
+                    {
+                        cap: 403550,
+                        rate: .24
+                    },
+                    {
+                        cap: 512450,
+                        rate: .32
+                    },
+                    {
+                        cap: 768700,
+                        rate: .35
+                    },
+                    {
+                        rate: .37
+                    },
+                ],
+                head: [
+                    {
+                        cap: 17700,
+                        rate: .10
+                    },
+                    {
+                        cap: 67450,
+                        rate: .12
+                    },
+                    {
+                        cap: 105700,
+                        rate: .22
+                    },
+                    {
+                        cap: 201775,
+                        rate: .24
+                    },
+                    {
+                        cap: 256200,
+                        rate: .32
+                    },
+                    {
+                        cap: 640600,
+                        rate: .35
+                    },
+                    {
+                        rate: .37
+                    },
+                ],
+            },
+            state: {
+                ny: {
+                    single: [
+                        {
+                            cap: 8500,
+                            rate: .04
+                        },
+                        {
+                            cap: 11700,
+                            rate: .045
+                        },
+                        {
+                            cap: 13900,
+                            rate: .0525
+                        },
+                        {
+                            cap: 80650,
+                            rate: .0550
+                        },
+                        {
+                            cap: 215400,
+                            rate: .0600
+                        },
+                        {
+                            cap: 1077550,
+                            rate: .0685
+                        },
+                        {
+                            cap: 5000000,
+                            rate: .0965
+                        },
+                        {
+                            cap: 25000000,
+                            rate: .1030
+                        },
+                        {
+                            rate: .1090
+                        }
+                    ],
+                    joint: [
+                        {
+                            cap: 17150,
+                            rate: .04
+                        },
+                        {
+                            cap: 23600,
+                            rate: .045
+                        },
+                        {
+                            cap: 27900,
+                            rate: .0525
+                        },
+                        {
+                            cap: 161550,
+                            rate: .0550
+                        },
+                        {
+                            cap: 323200,
+                            rate: .0600
+                        },
+                        {
+                            cap: 2155350,
+                            rate: .0685
+                        },
+                        {
+                            cap: 5000000,
+                            rate: .0965
+                        },
+                        {
+                            cap: 25000000,
+                            rate: .1030
+                        },
+                        {
+                            rate: .1090
+                        }
+                    ]
+                }
+            },
+            local: {
+                nyc: {
+                    single: [
+                        {
+                            cap: 12000,
+                            rate: .03078
+                        },
+                        {
+                            cap: 25000,
+                            rate: .03762
+                        },
+                        {
+                            cap: 50000,
+                            rate: .03819
+                        },
+                        {
+                            rate: .03876
+                        }
+                    ],
+                    joint: [
+                        {
+                            cap: 21600,
+                            rate: .03078
+                        },
+                        {
+                            cap: 45000,
+                            rate: .03762
+                        },
+                        {
+                            cap: 90000,
+                            rate: .03819
+                        },
+                        {
+                            rate: .03876
+                        }
+                    ],
+                    head: [
+                        {
+                            cap: 14400,
+                            rate: .03078
+                        },
+                        {
+                            cap: 30000,
+                            rate: .03762
+                        },
+                        {
+                            cap: 60000,
+                            rate: .03819
+                        },
+                        {
+                            rate: .03876
+                        }
+                    ],
+                }
+            }
+        }
+
+        window.addEventListener('load', function() {
+            document.getElementById('copy-year').innerText = (new Date()).getFullYear();
+        }, false);
+
+        function calculate() {
+            edit_hsa(document.getElementById(hsa_last_edited));
+            edit_retirement(document.getElementById(retirement_last_edited));
+            //Income
+            let salary = parseFloat(document.getElementById('salary').value);
+            document.getElementById('salary').value = salary.toFixed(2);
+            let stipends = parseFloat(document.getElementById('stipends').value);
+            document.getElementById('stipends').value = stipends.toFixed(2);
+            let gtl = parseFloat(document.getElementById('gtl').value);
+            document.getElementById('gtl').value = gtl.toFixed(2);
+            //Pre-Tax
+            let retirement = parseFloat(document.getElementById('retirement-cash').value);
+            document.getElementById('retirement-cash').value = retirement.toFixed(2);
+            let transit = parseFloat(document.getElementById('transit').value);
+            document.getElementById('transit').value = transit.toFixed(2);
+            let insurance = parseFloat(document.getElementById('insurance').value);
+            document.getElementById('insurance').value = insurance.toFixed(2);
+            let hsa = parseFloat(document.getElementById('hsa-cash').value);
+            document.getElementById('hsa-cash').value = hsa.toFixed(2);
+
+            let includeStipends = document.getElementById('include-stipends').checked;
+            let monthlyIncome = salary / 12 + gtl * 2;
+            if (includeStipends) {
+                monthlyIncome += stipends / 10;
+            }
+            document.getElementById('income').innerText = "$" + monthlyIncome.toFixed(2);
+
+            let monthlyPretax = transit * 2 + insurance * 2 + hsa / 12;
+            if(document.querySelector('input[name="retirement"]:checked').id === 'trad') {
+                monthlyPretax = monthlyPretax + retirement/12;
+            }
+            // document.getElementById('pretax').innerText = "$" + monthlyPretax.toFixed(2);
+
+            let monthlyDeductions = retirement / 12 + transit * 2 + insurance * 2 + hsa / 12
+            document.getElementById('deductions').innerText = "$" + monthlyDeductions.toFixed(2);
+
+            let monthlySocialTaxable = monthlyIncome - transit * 2 - insurance * 2 - hsa / 12;
+            let monthlySocial = monthlySocialTaxable * 0.062;
+            let monthlyMedicare = monthlySocialTaxable * 0.0145;
+            document.getElementById('social-security').innerText = "$" + monthlySocial.toFixed(2);
+            document.getElementById('medicare').innerText = "$" + monthlyMedicare.toFixed(2);
+            let monthlyTaxable = monthlyIncome - monthlyPretax;
+
+            let federal = get_federal_taxes(monthlyTaxable*12, document.getElementById("filing-as").value)/12
+            document.getElementById('federal-taxes').innerText = "$" + federal.toFixed(2);
+
+            let state = get_state_taxes(monthlyTaxable*12, 'ny', document.getElementById("filing-as").value)/12
+            document.getElementById('state-taxes').innerText = "$" + state.toFixed(2);
+
+            let local = get_local_taxes(monthlyTaxable*12, 'nyc', document.getElementById("filing-as").value)/12
+            document.getElementById('local-taxes').innerText = "$" + local.toFixed(2);
+
+            let total = monthlyIncome - monthlyDeductions - monthlySocial - monthlyMedicare - federal - state - local;
+            document.getElementById('total').innerText = "$" + total.toFixed(2);
+
+        }
+
+        function edit_retirement(target) {
+            let salary = parseFloat(document.getElementById('salary').value);
+            if(salary <= 0) return false;
+            retirement_last_edited = target.id;
+            if(retirement_last_edited == "retirement-cash") {
+                let cash = parseFloat(document.getElementById('retirement-cash').value);
+                if(cash === NaN) cash = 0;
+                let percent = cash / salary * 100;
+                document.getElementById('retirement-percent').value = percent.toFixed(2);
+                document.getElementById('retirement-cash').value = cash.toFixed(2);
+            } else {
+                let percent = parseFloat(document.getElementById('retirement-percent').value);
+                let cash =  salary * (percent / 100);
+                document.getElementById('retirement-cash').value = cash.toFixed(2);
+                document.getElementById('retirement-percent').value = percent.toFixed(2);
+            }
+        }
+
+        function edit_hsa(target) {
+            let salary = parseFloat(document.getElementById('salary').value);
+            hsa_last_edited = target.id;
+            if(hsa_last_edited == "hsa-cash") {
+                let cash = parseFloat(document.getElementById('hsa-cash').value);
+                let percent = cash / salary * 100;
+                document.getElementById('hsa-percent').value = percent.toFixed(2);
+                document.getElementById('hsa-cash').value = cash.toFixed(2);
+            } else {
+                let percent = parseFloat(document.getElementById('hsa-percent').value);
+                let cash = salary * (percent / 100);
+                document.getElementById('hsa-cash').value = cash.toFixed(2);
+                document.getElementById('hsa-percent').value = percent.toFixed(2);
+            }
+        }
+
+        function get_federal_taxes(taxable, type) {
+            let rates = brackets.federal[type];
+            let taxes = 0;
+            for(let i = 0; i < rates.length; i++) {
+                if (rates[i].cap != null) {
+                    if (taxable > rates[i].cap) {
+                        let amt = rates[i].cap;
+                        if(i > 0) {
+                            amt = rates[i].cap - rates[i-1].cap;
+                        }
+                        taxes += amt * rates[i].rate;
+                        taxable -= amt;
+                        continue;
+                    }
+                }
+                taxes += rates[i].rate * taxable;
+                break
+            }
+            return taxes;
+        }
+
+        function get_state_taxes(taxable, state='ny', type) {
+            if(type == 'head') type = 'single';
+            let rates = brackets.state[state][type];
+            let taxes = 0;
+            for(let i = 0; i < rates.length; i++) {
+                if (rates[i].cap != null) {
+                    if (taxable > rates[i].cap) {
+                        let amt = rates[i].cap;
+                        if(i > 0) {
+                            amt = rates[i].cap - rates[i-1].cap;
+                        }
+                        taxes += amt * rates[i].rate;
+                        taxable -= amt;
+                        continue;
+                    }
+                }
+                taxes += rates[i].rate * taxable;
+                break
+            }
+            return taxes;
+        }
+
+        function get_local_taxes(taxable, locality='nyc', type) {
+            let rates = brackets.local[locality][type];
+            let taxes = 0;
+            for(let i = 0; i < rates.length; i++) {
+                if (rates[i].cap != null) {
+                    if (taxable > rates[i].cap) {
+                        let amt = rates[i].cap;
+                        if(i > 0) {
+                            amt = rates[i].cap - rates[i-1].cap;
+                        }
+                        taxes += amt * rates[i].rate;
+                        taxable -= amt;
+                        continue;
+                    }
+                }
+                taxes += rates[i].rate * taxable;
+                break
+            }
+            return taxes;
+        }
+
+        let inputs = document.getElementsByTagName('input');
+        for (let i = 0; i < inputs.length; i++) {
+            inputs[i].addEventListener('change', calculate);
+        }
+    </script>
+    </body>
+</html>
