@@ -1,4 +1,4 @@
-<html>
+<html lang="en">
     <head>
         <title>Take Home Pay Calculator</title>
         <link rel="icon" type="image/x-icon" href="fav.svg">
@@ -52,7 +52,7 @@
                     </div>
                     <div class="input-group col-md-12 mb-3">
                         <span class="input-group-text">$</span>
-                        <input type="number" class="form-control" id="retirement-cash" placeholder="" onchange="edit_retirement(this)" value="0.00">
+                        <input type="number" class="form-control" id="retirement-cash" placeholder="24500" onchange="edit_retirement(this)" value="0.00">
                     </div>
                     <div class="input-group col-md-12 mb-3">
                         <input type="number" class="form-control" id="retirement-percent" placeholder="" onchange="edit_retirement(this)" value="0.00">
@@ -75,7 +75,7 @@
                     <label for="hsa-cash">HSA (Annual)</label>
                     <div class="input-group col-md-12 mb-3">
                         <span class="input-group-text">$</span>
-                        <input type="number" class="form-control" id="hsa-cash" placeholder="" onchange="edit_hsa(this)" value="0.00">
+                        <input type="number" class="form-control" id="hsa-cash" placeholder="3400" onchange="edit_hsa(this)" value="0.00">
                     </div>
                     <div class="input-group col-md-12 mb-3">
                         <input type="number" class="form-control" id="hsa-percent" placeholder="" onchange="edit_hsa(this)" value="0.00" max="100" min="0.00">
@@ -462,7 +462,7 @@
             let salary = parseFloat(document.getElementById('salary').value);
             if(salary <= 0) return false;
             retirement_last_edited = target.id;
-            if(retirement_last_edited == "retirement-cash") {
+            if(retirement_last_edited === "retirement-cash") {
                 let cash = parseFloat(document.getElementById('retirement-cash').value);
                 if(cash === NaN) cash = 0;
                 let percent = cash / salary * 100;
@@ -479,7 +479,7 @@
         function edit_hsa(target) {
             let salary = parseFloat(document.getElementById('salary').value);
             hsa_last_edited = target.id;
-            if(hsa_last_edited == "hsa-cash") {
+            if(hsa_last_edited === "hsa-cash") {
                 let cash = parseFloat(document.getElementById('hsa-cash').value);
                 let percent = cash / salary * 100;
                 document.getElementById('hsa-percent').value = percent.toFixed(2);
@@ -514,7 +514,7 @@
         }
 
         function get_state_taxes(taxable, state='ny', type) {
-            if(type == 'head') type = 'single';
+            if(type === 'head') type = 'single';
             let rates = brackets.state[state][type];
             let taxes = 0;
             for(let i = 0; i < rates.length; i++) {
