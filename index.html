@@ -464,7 +464,7 @@
             retirement_last_edited = target.id;
             if(retirement_last_edited === "retirement-cash") {
                 let cash = parseFloat(document.getElementById('retirement-cash').value);
-                if(cash === NaN) cash = 0;
+                if(isNaN(cash)) cash = 0;
                 let percent = cash / salary * 100;
                 document.getElementById('retirement-percent').value = percent.toFixed(2);
                 document.getElementById('retirement-cash').value = cash.toFixed(2);
